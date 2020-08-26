@@ -54,7 +54,7 @@ tst = pyTST()
 
 tst.load_data_file("example_data_filename", signal_column=1, time_column=0, tstep=0.05)
 
-tst.compute_analysis(step_size=10)
+tst.compute_TST(step_size=10)
 tst.export_to_txt("TST_analysis.dat")
 # tst.import_from_txt("TST_analysis.dat")
 tst.plot()
@@ -77,7 +77,7 @@ signal[0:100] += np.linspace(1,0, 100)
 tst = pyTST()
 tst.load_data_array(signal_array=signal, time_array=t)
 
-tst.compute_analysis(step_size=10)
+tst.compute_TST(step_size=10)
 tst.export_to_txt("TST_analysis.dat")
 # tst.import_from_txt("TST_analysis.dat")
 tst.plot()

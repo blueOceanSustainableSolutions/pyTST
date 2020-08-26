@@ -35,7 +35,7 @@ else:
                        signal_column=args.signal_col,  
                        time_column=args.time_col)
 
-    tst.compute_analysis(nproc=args.nproc,
+    tst.compute_TST(nproc=args.nproc,
                          step_size=args.step_size)
 
 if not args.export_txt is None:

@@ -67,7 +67,7 @@ class pyTST:
             self.time_array = timedata[:, 1]*tstep
 
 
-    def compute_analysis(self, step_size=10, analyse_end=False, nproc=None):
+    def compute_TST(self, step_size=10, analyse_end=False, nproc=None):
         """
         Actual computation of the Transient Scanning Technique 
 
