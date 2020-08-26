@@ -8,7 +8,7 @@ This module performs the "Transient Scanning Technique" presented in:
 
 * Brouwer, J., Tukker, J., Klinkenberg, Y., & van Rijsbergen, M. (2019). Random uncertainty of statistical moments in testing: Mean. Ocean Engineering, 182(April), 563–576. https://doi.org/10.1016/j.oceaneng.2019.04.068
 
-It allows to easily detect transient portion of signal data.
+It allows to easily detect transient portion of a signal.
 
 <p align="center">
        <img src="example/signal.png">
@@ -16,7 +16,7 @@ It allows to easily detect transient portion of signal data.
 </p>
 
 
-## Installation
+## Install
 Can be installed and use like any python package, for example:
 ``` sh
 pip3 install --user https://github.com/WavEC-Offshore-Renewables/pyTST/archive/master.zip
@@ -27,7 +27,7 @@ pip3 install --user https://github.com/WavEC-Offshore-Renewables/pyTST/archive/m
 ## Usage
 This package provides both a command line tool as well as a python library (for more flexibility).  
 
-### Command line usage
+### Command line
 If the signal data looks like:
 ```
 # time   signal
@@ -43,9 +43,9 @@ the following can be used
 TST-cli --time-col=0 --signal-col=1 example_data_filename
 ```
    
-See `TST-cli -h` for more details on the possibilities available.
+See `TST-cli -h` for more details on the capabilities.
 
-### Library examples
+### Python library
 Signal data can be loaded from a file:
 ``` python
 from pyTST import pyTST
@@ -60,7 +60,7 @@ tst.export_to_txt("TST_analysis.dat")
 tst.plot()
 ```
 
-Or data can be directly provided:
+Or provided via python arrays:
 ``` python
 import numpy as np
 from pyTST import pyTST
