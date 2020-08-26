@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
+import argparse
+from pyTST import pyTST
+
+parser = argparse.ArgumentParser(description='Performs Transient Scanning Technique analysis.')
+
+parser.add_argument('filename', type=str, nargs='?', 
+                    help='filename containing the data', default='.')
+parser.add_argument('--signal-col', type=int,
+                    help='in filename, column index containing the signal data')
+parser.add_argument('--time-col', type=int,
+                    help='in filename, column index containing the time data')
+parser.add_argument('--step-size', type=int,
+                    help='size of the steps for the TST, variance over signal_length/step_size slices will be performed')
+parser.add_argument('--nproc', type=int, 
+                    help='Number of process to use')
+parser.add_argument('--export-txt', type=str, 
+                    help='Export TST data to txt file')
+parser.add_argument('--import-txt', type=str, 
+                    help='Import already compyted TST from txt file')
+parser.add_argument('--export-plot', type=str, 
+                    help='Export plot to image file')
+parser.add_argument('--no-plot', action='store_true', default=False,
+                    help='Do not display plot graphicaly')
+
+
+args = parser.parse_args()
+
+tst = pyTST()
+if not args.import_txt is None:
+    tst.import_from_txt(args.import_txt)
+else:
+    tst.load_data_file(args.filename,
+                       signal_column=args.signal_col,  
+                       time_column=args.time_col)
+
+    tst.compute_analysis(nproc=args.nproc,
+                         step_size=args.step_size)
+
+if not args.export_txt is None:
+    tst.export_to_txt(args.export_txt)
+
+if (not args.no_plot) or (not args.export_plot is None) :
+    tst.plot(filename=args.export_plot)
+
