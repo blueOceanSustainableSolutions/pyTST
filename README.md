@@ -2,9 +2,9 @@
 
 This module performs the "Transient Scanning Technique" presented in:
 
-        Brouwer, J., Tukker, J., & van Rijsbergen, M. (2013). Uncertainty Analysis of Finite Length Measurement Signals. The 3rd International Conference on Advanced Model Measurement Technology for the EU Maritime Industry, February.
-and
-        Brouwer, J., Tukker, J., & van Rijsbergen, M. (2015). Uncertainty Analysis and Stationarity Test of Finite Length Time Series Signals. 4th International Conference on Advanced Model Measurement Technology for the Maritime Industry.
+* Brouwer, J., Tukker, J., & van Rijsbergen, M. (2013). Uncertainty Analysis of Finite Length Measurement Signals. 3rd International Conference on Advanced Model Measurement Technology for the EU Maritime Industry.
+       
+* Brouwer, J., Tukker, J., & van Rijsbergen, M. (2015). Uncertainty Analysis and Stationarity Test of Finite Length Time Series Signals. 4th International Conference on Advanced Model Measurement Technology for the Maritime Industry.
 
 
 ## Installation
@@ -13,10 +13,9 @@ Can be installed and use like any python package, for example:
 
 
 ## Usage
-This package provides both a command line tool as well as a python library (for more flexibility). 
-Usage examples for the library are provided in `example` folder. 
+This package provides both a command line tool as well as a python library (for more flexibility).  
 
-### Command line examples
+### Command line usage
 If the signal data looks like:
 ```
 # time   signal
@@ -42,6 +41,29 @@ from pyTST import pyTST
 tst = pyTST()
 
 tst.load_data_file("example_data_filename", signal_column=1, time_column=0, tstep=0.05)
+
+tst.compute_analysis(step_size=10)
+tst.export_to_txt("TST_analysis.dat")
+# tst.import_from_txt("TST_analysis.dat")
+tst.plot()
+```
+
+Or data can be directly provided:
+```
+import numpy as np
+from pyTST import pyTST
+
+# Signal creation
+t = np.linspace(1,1000, 5000)
+
+signal = np.sin(t)
+
+# Addition of initial transiant effect
+signal[0:100] += np.linspace(1,0, 100)
+
+
+tst = pyTST()
+tst.load_data_array(signalay=t)
 
 tst.compute_analysis(step_size=10)
 tst.export_to_txt("TST_analysis.dat")
