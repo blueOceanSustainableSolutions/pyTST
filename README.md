@@ -8,6 +8,12 @@ This module performs the "Transient Scanning Technique" presented in:
 
 It allows to easily detect transient portion of signal data.
 
+<p align="center">
+       <img src="example/signal.png">
+       <img src="example/TST.png">
+</p>
+
+
 ## Installation
 Can be installed and use like any python package, for example:
 ``` sh
@@ -38,7 +44,7 @@ TST-cli --time-col=0 --signal-col=1 example_data_filename
 See `TST-cli -h` for more details on the possibilities available.
 
 ### Library examples
-Signal data can be loaded from a file
+Signal data can be loaded from a file:
 ``` python
 from pyTST import pyTST
 
