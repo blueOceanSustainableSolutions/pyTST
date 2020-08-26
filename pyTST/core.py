@@ -66,7 +66,7 @@ class pyTST:
         if time_column is None:
             self.time_array = (np.array(range(len(self.signal_array)))+1)*tstep
         else:
-            self.time_array = timedata[:, 1]
+            self.time_array = timedata[:, 1]*tstep
 
 
     def compute_analysis(self, step_size=10, analyse_end=False, nproc=None):
@@ -209,7 +209,7 @@ class pyTST:
         pyplot.xlim(right=self.step_time_array[-1]*2,
                     left=self.step_time_array[0]/2)
         pyplot.xlabel("t")
-        pyplot.ylabel("Uncertainty")
+        pyplot.ylabel("95% uncertainty (u95)")
 
 
         if filename is None:
