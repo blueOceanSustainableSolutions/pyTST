@@ -10,7 +10,7 @@ It allows to easily detect transient portion of signal data.
 
 ## Installation
 Can be installed and use like any python package, for example:
-```
+``` sh
 pip3 install --user https://github.com/WavEC-Offshore-Renewables/pyTST/archive/master.zip
 ```
 
@@ -31,7 +31,7 @@ If the signal data looks like:
 
 the following can be used
 
-```
+``` sh
 TST-cli --time-col=0 --signal-col=1 example_data_filename
 ```
    
@@ -39,7 +39,7 @@ See `TST-cli -h` for more details on the possibilities available.
 
 ### Library examples
 Signal data can be loaded from a file
-```
+``` python
 from pyTST import pyTST
 
 tst = pyTST()
@@ -53,7 +53,7 @@ tst.plot()
 ```
 
 Or data can be directly provided:
-```
+``` python
 import numpy as np
 from pyTST import pyTST
 
