@@ -75,7 +75,7 @@ signal[0:100] += np.linspace(1,0, 100)
 
 
 tst = pyTST()
-tst.load_data_array(signalay=t)
+tst.load_data_array(signal_array=signal, time_array=t)
 
 tst.compute_analysis(step_size=10)
 tst.export_to_txt("TST_analysis.dat")
