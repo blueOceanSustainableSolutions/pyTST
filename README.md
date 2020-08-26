@@ -2,9 +2,9 @@
 
 This module performs the "Transient Scanning Technique" presented in:
 
-* Brouwer, J., Tukker, J., & van Rijsbergen, M. (2013). Uncertainty Analysis of Finite Length Measurement Signals. 3rd International Conference on Advanced Model Measurement Technology for the EU Maritime Industry.
+* Brouwer, J., Tukker, J., & van Rijsbergen, M. (2013). Uncertainty Analysis of Finite Length Measurement Signals. 3rd International Conference on Advanced Model Measurement Technology for the EU Maritime Industry. [[PDF]](https://www.researchgate.net/profile/Joris_Brouwer/publication/295702719_Uncertainty_Analysis_of_Finite_Length_Measurement_Signals/links/56cc943e08ae059e375067d9/Uncertainty-Analysis-of-Finite-Length-Measurement-Signals.pdf)
        
-* Brouwer, J., Tukker, J., & van Rijsbergen, M. (2015). Uncertainty Analysis and Stationarity Test of Finite Length Time Series Signals. 4th International Conference on Advanced Model Measurement Technology for the Maritime Industry.
+* Brouwer, J., Tukker, J., & van Rijsbergen, M. (2015). Uncertainty Analysis and Stationarity Test of Finite Length Time Series Signals. 4th International Conference on Advanced Model Measurement Technology for the Maritime Industry. [[PDF]](https://www.researchgate.net/profile/Joris_Brouwer/publication/295694401_Uncertainty_Analysis_and_Stationarity_Test_of_Finite_Length_Time_Series_Signals/links/56cc7e2208ae96cdd071bb92/Uncertainty-Analysis-and-Stationarity-Test-of-Finite-Length-Time-Series-Signals.pdf)
 
 * Brouwer, J., Tukker, J., Klinkenberg, Y., & van Rijsbergen, M. (2019). Random uncertainty of statistical moments in testing: Mean. Ocean Engineering, 182(April), 563–576. https://doi.org/10.1016/j.oceaneng.2019.04.068
 
