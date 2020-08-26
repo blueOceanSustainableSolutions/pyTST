@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 import argparse
 from pyTST import pyTST
 
@@ -14,18 +13,17 @@ parser.add_argument('--signal-col', type=int,
 parser.add_argument('--time-col', type=int,
                     help='in filename, column index containing the time data')
 parser.add_argument('--step-size', type=int,
-                    help='size of the steps for the TST, variance over signal_length/step_size slices will be performed')
+                    help='size of the steps for the TST, for better performance the TST is performed every step-size time steps')
 parser.add_argument('--nproc', type=int, 
-                    help='Number of process to use')
+                    help='Number of parallel processes to use')
 parser.add_argument('--export-txt', type=str, 
                     help='Export TST data to txt file')
 parser.add_argument('--import-txt', type=str, 
-                    help='Import already compyted TST from txt file')
+                    help='Import already computed TST from txt file')
 parser.add_argument('--export-plot', type=str, 
                     help='Export plot to image file')
 parser.add_argument('--no-plot', action='store_true', default=False,
-                    help='Do not display plot graphicaly')
-
+                    help='Do not display plot graphically')
 
 args = parser.parse_args()
 

@@ -6,8 +6,6 @@ import multiprocessing as mp
 from matplotlib import pyplot
 
 
-# None = object()
-
 class pyTST:
     def load_data_array(self, signal_array, time_array=None, tstep=1):
         """
