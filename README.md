@@ -6,9 +6,13 @@ This module performs the "Transient Scanning Technique" presented in:
        
 * Brouwer, J., Tukker, J., & van Rijsbergen, M. (2015). Uncertainty Analysis and Stationarity Test of Finite Length Time Series Signals. 4th International Conference on Advanced Model Measurement Technology for the Maritime Industry.
 
+It allows to easily detect transient portion of signal data.
 
 ## Installation
 Can be installed and use like any python package, for example:
+```
+pip3 install --user https://github.com/WavEC-Offshore-Renewables/pyTST/archive/master.zip
+```
 
 
 
@@ -34,7 +38,7 @@ TST-cli --time-col=0 --signal-col=1 example_data_filename
 See `TST-cli -h` for more details on the possibilities available.
 
 ### Library examples
-When loading data from a file
+Signal data can be loaded from a file
 ```
 from pyTST import pyTST
 
@@ -58,7 +62,7 @@ t = np.linspace(1,1000, 5000)
 
 signal = np.sin(t)
 
-# Addition of initial transiant effect
+# Add initial transiant effect
 signal[0:100] += np.linspace(1,0, 100)
 
 
