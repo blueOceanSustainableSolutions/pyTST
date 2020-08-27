@@ -11,13 +11,13 @@ This module performs the "Transient Scanning Technique" presented in:
 It allows to easily detect transient portion of a signal.
 
 <p align="center">
-       <img src="example/signal.png">
-       <img src="example/TST.png">
+    <img src="example/signal.png">
+    <img src="example/TST.png">
 </p>
 
 
 ## Install
-Can be installed and use like any python package, for example:
+Can be installed like any python package, for example:
 ``` sh
 pip3 install --user https://github.com/WavEC-Offshore-Renewables/pyTST/archive/master.zip
 ```
@@ -81,4 +81,10 @@ tst.compute_TST(step_size=10)
 tst.export_to_txt("TST_analysis.dat")
 # tst.import_from_txt("TST_analysis.dat")
 tst.plot()
+```
+
+For more info, the library is documented via docstrings:
+``` python
+from pyTST import pyTST
+help(pyTST)
 ```

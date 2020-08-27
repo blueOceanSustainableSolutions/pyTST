@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# Transient Scanning Technique implementation
+# Sebastien Lemaire: <sebastien.lemaire@soton.ac.uk>
 
 import numpy as np
 import multiprocessing as mp
@@ -215,6 +217,8 @@ class pyTST:
         else:
             print("Figure exported to {}".format(filename))
             pyplot.savefig(filename)
+
+        return fig, ax
 
 
 
