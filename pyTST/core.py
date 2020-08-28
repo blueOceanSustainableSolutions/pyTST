@@ -9,6 +9,27 @@ from matplotlib import pyplot
 
 
 class pyTST:
+    """
+    Class performing and processing the Transient Scanning Technique
+
+    To get a TST one can either:
+
+    * Load signal from a file
+        >>> tst.load_data_file(filename, signal_col=1)
+        >>> tst.compute_TST()
+
+    * Load signal from an array
+        >>> tst.load_data_array(signal_array)
+        >>> tst.compute_TST()
+
+    * Load directly from a txt file (previously exported with tst.export_to_txt)
+        >>> tst.import_from_txt(filename)
+
+    Once the TST is computed or loaded, one can either plot it or export it to file
+        >>> tst.plot()
+        >>> tst.export_to_txt(filename)
+
+    """
     def load_data_array(self, signal_array, time_array=None, tstep=1):
         """
         Load time signal data from python array
@@ -18,10 +39,10 @@ class pyTST:
         signal_array : array of float
             signal to use for the TST
 
-        time_array : array of float
+        time_array : array of float, optional
             time stamps assiciated with signal_array
 
-        tstep : float
+        tstep : float, optional
             time step used when time_array is not provided
         """
 
@@ -38,20 +59,20 @@ class pyTST:
 
         Parameters
         ----------
-        filename : string
+        filename : str
             filename where the data is located
 
         signal_column : int
             index of the column where the signal is located
 
-        time_column : int
+        time_column : int, optional
             index of the time column in the file
 
-        tstep : float
+        tstep : float, optional
             multiplier for the time_column, useful to convert a counter column to real time steps,
             or timestep used when time_column is not provided
 
-        kwargs
+        **kwargs
             any other parameter is passed directly to numpy.loadtxt
         """
 
@@ -75,13 +96,13 @@ class pyTST:
 
         Parameters
         ----------
-        step_size : int
+        step_size : int, optional
             size of the steps for the TST, data length/step_size computations will be performed
 
-        analyse_end : Boolean
+        analyse_end : bool, optional
             analyse the end of the signal instead of the begining, (TST-B instead of TST-A)
 
-        nproc : int
+        nproc : int, optional
             number of process to use for the parallel computation, 
             if not provided the maximum available will be used
 
@@ -123,7 +144,7 @@ class pyTST:
 
         Parameters
         ----------
-        filename : string
+        filename : str
             filename of the file to save
             
         """
@@ -138,7 +159,7 @@ class pyTST:
 
         Parameters
         ----------
-        filename : string
+        filename : str
             filename of the file to import
             
         """
@@ -155,10 +176,10 @@ class pyTST:
         Parameters
         ----------
 
-        filename : string
+        filename : str, optional
             if provided, the plot will be exported to filename
 
-        show_cursor : Boolean
+        show_cursor : bool, optional
             True if a cursor is ploted. Double clicking on the plot will move it
 
         """
@@ -226,24 +247,24 @@ class pyTST:
 
 def variance_stats(data):
     """
-        Calculate variance statistics based on
+    Calculate variance statistics based on:
         Brouwer, J., Tukker, J., & van Rijsbergen, M. (2013). Uncertainty Analysis of Finite Length Measurement Signals. The 3rd International Conference on Advanced Model Measurement Technology for the EU Maritime Industry, February.
         Brouwer, J., Tukker, J., & van Rijsbergen, M. (2015). Uncertainty Analysis and Stationarity Test of Finite Length Time Series Signals. 4th International Conference on Advanced Model Measurement Technology for the Maritime Industry.
         Brouwer, J., Tukker, J., Klinkenberg, Y., & van Rijsbergen, M. (2019). Random uncertainty of statistical moments in testing: Mean. Ocean Engineering, 182(April), 563–576. https://doi.org/10.1016/j.oceaneng.2019.04.068
 
 
-        Parameters
-        ----------
-        data : array of float
-            time signal to get the variance uncertainty from
+    Parameters
+    ----------
+    data : array of float
+        time signal to get the variance uncertainty from
 
-        Returns
-        ----------
-        mean: float
-            mean of the signal
+    Returns
+    ----------
+    mean: float
+        mean of the signal
 
-        u95: float
-            95% confidence bound (1.96* expected standard deviation of the mean)
+    u95: float
+        95% confidence bound (1.96* expected standard deviation of the mean)
     """
 
     N = len(data)
@@ -255,7 +276,7 @@ def variance_stats(data):
     Cxx = np.real(Cxx[0:N])                           # crop till Nyquist point
 
     # Variance estimators
-    iArr     = np.abs(range(1-N,N))                       # indexing for -T to T integral
+    iArr = np.abs(range(1-N,N))                           # indexing for -T to T integral
     var_x_av = 0.5/N*np.sum((1.0 - iArr*1.0/N)*Cxx[iArr]) # variance estimate for mean value (including factor 0.5 for bias correction)
 
     # expanded uncertainty factor for normal distribution with 95% confidence
