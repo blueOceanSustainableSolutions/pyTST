@@ -13,7 +13,7 @@ tst.load_data_file("example_data_filename", signal_column=1, time_column=0, tste
 
 # fix to prevent recursive spawning under Windows
 if __name__ == '__main__':
-  tst.compute_TST(step_size=4)
+    tst.compute_TST(step_size=4)
 tst.plot()
 
 # Plot input signal data
