@@ -3,3 +3,4 @@
 __version__ = '0.9.1'
 
 from .core import pyTST
+from .core import variance_stats
