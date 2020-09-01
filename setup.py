@@ -1,12 +1,12 @@
 import setuptools
-import PyTST
+import pyTST
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="pyTST",
-    version=PyTST.__version__,
+    version=pyTST.__version__,
     author="Sebastien Lemaire",
     author_email="sebastien.lemaire@soton.ac.uk",
     description="Tools performing Transient Scanning Technique",
