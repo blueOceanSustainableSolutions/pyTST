@@ -82,11 +82,12 @@ class pyTST:
             usecols = (signal_column, time_column)
 
         timedata = np.loadtxt(filename, usecols=usecols, **kwargs)
-        self.signal_array = timedata[:, 0]
-
+        
         if time_column is None:
+            self.signal_array = timedata
             self.time_array = (np.array(range(len(self.signal_array)))+1)*tstep
         else:
+            self.signal_array = timedata[:, 0]
             self.time_array = timedata[:, 1]*tstep
 
 
