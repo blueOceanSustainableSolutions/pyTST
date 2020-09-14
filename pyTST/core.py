@@ -8,6 +8,15 @@ import multiprocessing as mp
 from matplotlib import pyplot
 
 
+def moving_average(y, n=10) :
+    y_padded = np.pad(y, (n//2, n-1-n//2), mode='edge')
+    y_smooth = np.convolve(y_padded, np.ones((n,))/n, mode='valid') 
+    return y_smooth
+
+
+
+
+
 class pyTST:
     """
     Class performing and processing the Transient Scanning Technique
@@ -44,6 +53,9 @@ class pyTST:
 
         tstep : float, optional
             time step used when time_array is not provided
+
+        moving_average : array of float
+            moving average based on the used step size
         """
 
         self.signal_array = signal_array
@@ -51,6 +63,7 @@ class pyTST:
             self.time_array = (np.array(range(len(self.signal_array)))+1)*tstep
         else:
             self.time_array = time_array
+        self.moving_average = np.array(signal_array.size)
 
 
     def load_data_file(self, filename, signal_column, time_column=None, tstep=1, **kwargs):
@@ -82,13 +95,15 @@ class pyTST:
             usecols = (signal_column, time_column)
 
         timedata = np.loadtxt(filename, usecols=usecols, **kwargs)
-        
+
+
         if time_column is None:
             self.signal_array = timedata
             self.time_array = (np.array(range(len(self.signal_array)))+1)*tstep
         else:
             self.signal_array = timedata[:, 0]
             self.time_array = timedata[:, 1]*tstep
+        self.moving_average = np.array(self.signal_array.size)
 
 
     def compute_TST(self, step_size=10, analyse_end=False, nproc=None):
@@ -136,6 +151,10 @@ class pyTST:
         self.u95_array = [ row[1] for row in result ]
         self.step_time_array = np.array([ time[step_size*istart] for istart in range(nb_slices) ])
 
+
+
+        self.moving_average = moving_average(self.signal_array,n=step_size)
+
         if analyse_end:
             self.step_time_array = self.step_time_array[::-1]
 
@@ -170,7 +189,8 @@ class pyTST:
         self.u95_array = timedata[:, 1]
         self.mean_array = timedata[:, 2]
 
-    def plot(self, filename=None, show_cursor=True):
+    def plot(self, filename=None, fileFormat='.png',show_cursor=True,\
+            selectTimeDiscard=True,step_size=10):
         """
         Plot the TST results previously computed
 
@@ -181,19 +201,23 @@ class pyTST:
             if provided, the plot will be exported to filename
 
         show_cursor : bool, optional
-            True if a cursor is ploted. Double clicking on the plot will move it
+            True if a cursor is plotted. Double clicking on the plot will move it
+        selectTimeDiscard: bool, optional
+            True if you wish to discard start-up effect by selecting in graph
+        step_size : integer, optional
+            Same as in TST, used for moving average.
 
         """
 
-        fig, ax = pyplot.subplots()
-        pyplot.loglog(self.step_time_array, self.u95_array[::-1])
+        # Plot TST
+        fig0, ax0 = pyplot.subplots()
 
 
         # Display the grid (t, 1/t)
         grid_t = np.array([self.step_time_array[0]/2, self.step_time_array[-1]*2])
         for i in range(-20,20):
             factor = 10**(i/2)
-            pyplot.loglog(grid_t,
+            ax0.loglog(grid_t,
                           factor/grid_t,
                           color='grey', alpha=0.5, linewidth=0.5)
 
@@ -204,8 +228,12 @@ class pyTST:
 
                 hline.set_ydata(min_u95)
                 vline.set_xdata(self.step_time_array[index])
+                ax0.loglog(self.step_time_array[:self.step_time_array.size - (self.step_time_array.size-index)], self.u95_array[:(self.step_time_array.size-index-1):-1], color='C0')
+                ax0.loglog(self.step_time_array[self.step_time_array.size - (self.step_time_array.size-index):], self.u95_array[(self.step_time_array.size-index-1)::-1], color='C1')
                 text.set_text('u95={:2e}\nt={}'.format(min_u95, discard_time))
-                print("t={}, mean={:e} ± {:e}".format(discard_time, self.mean_array[-index-1], min_u95))
+                print("t={}, mean={:e} ± {:e}".format(discard_time, self.mean_array[-index-1], min_u95))                         
+                return index
+
 
 
             def onclick(event):
@@ -215,35 +243,68 @@ class pyTST:
 
                 index = min(np.searchsorted(self.step_time_array, event.xdata), len(self.step_time_array) - 1)
                 update_cursor(index)
+
                 pyplot.draw()
-
-            hline = ax.axhline(color='k', lw=0.8, ls='--', alpha=0.6)
-            vline = ax.axvline(color='k', lw=0.8, ls='--', alpha=0.6)
-
-            text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
-            update_cursor(np.argmin(self.u95_array[::-1]))
-
-            cid = fig.canvas.mpl_connect('button_press_event', onclick)
+                global indexGlobal 
+                indexGlobal = index
+                return
 
 
-        pyplot.ylim(top=np.max(self.u95_array)*2,
+            hline = ax0.axhline(color='k', lw=0.8, ls='--', alpha=0.6)
+            vline = ax0.axvline(color='k', lw=0.8, ls='--', alpha=0.6)
+
+            text = ax0.text(0.05, 0.9, '', transform=ax0.transAxes)
+            index = update_cursor(np.argmin(self.u95_array[::-1]))
+
+    
+            if selectTimeDiscard:
+              cid = fig0.canvas.mpl_connect('button_press_event', onclick)
+
+
+
+
+
+
+        ax0.set_ylim(top=np.max(self.u95_array)*2,
                     bottom= np.min(self.u95_array)/2)
-        pyplot.xlim(right=self.step_time_array[-1]*2,
+        ax0.set_xlim(right=self.step_time_array[-1]*2,
                     left=self.step_time_array[0]/2)
-        pyplot.xlabel("t")
-        pyplot.ylabel("95% uncertainty (u95)")
+        ax0.set_xlabel("timestep",fontsize=16)
+        ax0.set_ylabel("95% uncertainty ($U_{95} (\phi)$)",fontsize=16)
+
+        pyplot.show()
 
 
+            
+
+        # Plot input signal data
+        fig1, ax1 = pyplot.subplots()
+
+        if selectTimeDiscard:
+          idx = (self.step_time_array.size-indexGlobal)*step_size
+        else:
+          idx = index
+
+        ax1.axvline(self.time_array[idx], color='k', lw=0.8, ls='--', alpha=0.6)
+
+        ax1.plot(self.time_array[0:idx], self.signal_array[0:idx], color='C1',linewidth=2,label='discarded time')
+        ax1.plot(self.time_array[idx:], self.signal_array[idx:], color='C0',linewidth=2,label='stationary region')
+        ax1.plot(self.time_array,self.moving_average, color='r',label='moving average')
+
+        ax1.set_xlabel("$t / $s",fontsize=16)
+        ax1.set_ylabel("$\phi$",fontsize=16)
+        ax1.legend(fontsize=16)
+        
+        
+        
         if filename is None:
             pyplot.show()
         else:
+            pyplot.show()
             print("Figure exported to {}".format(filename))
-            pyplot.savefig(filename)
-
-        return fig, ax
-
-
-
+            fig0.savefig(filename+'_TST'+fileFormat,dpi=1000)
+            fig1.savefig(filename+'_signal'+fileFormat,dpi=1000)
+        return
 
 
 def variance_stats(data):
