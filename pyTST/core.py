@@ -53,9 +53,6 @@ class pyTST:
 
         tstep : float, optional
             time step used when time_array is not provided
-
-        moving_average : array of float
-            moving average based on the used step size
         """
 
         self.signal_array = signal_array
@@ -63,7 +60,6 @@ class pyTST:
             self.time_array = (np.array(range(len(self.signal_array)))+1)*tstep
         else:
             self.time_array = time_array
-        self.moving_average = np.array(signal_array.size)
 
 
     def load_data_file(self, filename, signal_column, time_column=None, tstep=1, **kwargs):
@@ -189,21 +185,23 @@ class pyTST:
         self.u95_array = timedata[:, 1]
         self.mean_array = timedata[:, 2]
 
-    def plot(self, filename=None, fileFormat='.png',show_cursor=True,\
-            selectTimeDiscard=True,step_size=10):
+    def plot(self, fileprefix=None, fileformat='.png',show_cursor=True,\
+            select_time_discard=True,step_size=10):
         """
         Plot the TST results previously computed
 
         Parameters
         ----------
 
-        filename : str, optional
-            if provided, the plot will be exported to filename
+        fileprefix, fileformat : str, optional
+            if provided, the plot will be exported to fileprefix + fileformat
 
         show_cursor : bool, optional
             True if a cursor is plotted. Double clicking on the plot will move it
-        selectTimeDiscard: bool, optional
+
+        select_time_discard: bool, optional
             True if you wish to discard start-up effect by selecting in graph
+
         step_size : integer, optional
             Same as in TST, used for moving average.
 
@@ -211,6 +209,8 @@ class pyTST:
 
         # Plot TST
         fig0, ax0 = pyplot.subplots()
+
+        time_size = self.step_time_array.size
 
 
         # Display the grid (t, 1/t)
@@ -228,11 +228,13 @@ class pyTST:
 
                 hline.set_ydata(min_u95)
                 vline.set_xdata(self.step_time_array[index])
-                ax0.loglog(self.step_time_array[:self.step_time_array.size - (self.step_time_array.size-index)], self.u95_array[:(self.step_time_array.size-index-1):-1], color='C0')
-                ax0.loglog(self.step_time_array[self.step_time_array.size - (self.step_time_array.size-index):], self.u95_array[(self.step_time_array.size-index-1)::-1], color='C1')
+                ax0.loglog(self.step_time_array[:time_size - (time_size-index)], \
+                    self.u95_array[:(time_size-index-1):-1], color='C0')
+                ax0.loglog(self.step_time_array[time_size - (time_size-index):], \
+                    self.u95_array[(time_size-index-1)::-1], color='C1')
                 text.set_text('u95={:2e}\nt={}'.format(min_u95, discard_time))
                 print("t={}, mean={:e} ± {:e}".format(discard_time, self.mean_array[-index-1], min_u95))                         
-                return index
+                return
 
 
 
@@ -241,12 +243,10 @@ class pyTST:
                 if not event.dblclick:
                     return
 
-                index = min(np.searchsorted(self.step_time_array, event.xdata), len(self.step_time_array) - 1)
-                update_cursor(index)
+                self.current_index = min(np.searchsorted(self.step_time_array, event.xdata), len(self.step_time_array) - 1)
+                update_cursor(self.current_index)
 
                 pyplot.draw()
-                global indexGlobal 
-                indexGlobal = index
                 return
 
 
@@ -257,7 +257,7 @@ class pyTST:
             index = update_cursor(np.argmin(self.u95_array[::-1]))
 
     
-            if selectTimeDiscard:
+            if select_time_discard:
               cid = fig0.canvas.mpl_connect('button_press_event', onclick)
 
 
@@ -280,8 +280,9 @@ class pyTST:
         # Plot input signal data
         fig1, ax1 = pyplot.subplots()
 
-        if selectTimeDiscard:
-          idx = (self.step_time_array.size-indexGlobal)*step_size
+        if select_time_discard:
+          idx = (time_size-self.current_index)*step_size
+
         else:
           idx = index
 
@@ -297,13 +298,13 @@ class pyTST:
         
         
         
-        if filename is None:
+        if fileprefix is None:
             pyplot.show()
         else:
             pyplot.show()
-            print("Figure exported to {}".format(filename))
-            fig0.savefig(filename+'_TST'+fileFormat,dpi=1000)
-            fig1.savefig(filename+'_signal'+fileFormat,dpi=1000)
+            print("Figure exported to {}".format(fileprefix))
+            fig0.savefig(fileprefix+'_TST'+fileformat,dpi=1000)
+            fig1.savefig(fileprefix+'_signal'+fileformat,dpi=1000)
         return
 
 
@@ -345,4 +346,3 @@ def variance_stats(data):
     u95 = 1.96*np.sqrt(var_x_av)
 
     return mean, u95
-
