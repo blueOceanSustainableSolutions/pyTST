@@ -92,7 +92,7 @@ class pyTST:
 
     def compute_TST(self, step_size=10, analyse_end=False, nproc=None):
         """
-        Actual computation of the Transient Scanning Technique 
+        Actual computation of the Transient Scanning Technique
 
         Parameters
         ----------
@@ -103,7 +103,7 @@ class pyTST:
             analyse the end of the signal instead of the begining, (TST-B instead of TST-A)
 
         nproc : int, optional
-            number of process to use for the parallel computation, 
+            number of process to use for the parallel computation,
             if not provided the maximum available will be used
 
         """
@@ -146,9 +146,9 @@ class pyTST:
         ----------
         filename : str
             filename of the file to save
-            
+
         """
- 
+
         export_array = np.column_stack((self.step_time_array, self.u95_array, self.mean_array),)
         np.savetxt(filename, export_array,
                    header="t, u95, mean")
@@ -161,9 +161,9 @@ class pyTST:
         ----------
         filename : str
             filename of the file to import
-            
+
         """
- 
+
         timedata = np.loadtxt(filename)
         self.step_time_array = timedata[:, 0]
         self.u95_array = timedata[:, 1]
