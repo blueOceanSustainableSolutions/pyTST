@@ -170,7 +170,7 @@ class pyTST:
         self.u95_array = timedata[:, 1]
         self.mean_array = timedata[:, 2]
 
-    def plot(self, filename=None, show_cursor=True):
+    def plot(self, filename=None, interactive=True):
         """
         Plot the TST results previously computed
 
@@ -180,24 +180,28 @@ class pyTST:
         filename : str, optional
             if provided, the plot will be exported to filename
 
-        show_cursor : bool, optional
-            True if a cursor is ploted. Double clicking on the plot will move it
-
+        interactive : bool, optional
+            True if the signal is also ploted and the discarded time is highlighted in orange, 
+            double clicking on the plot will move the cursor and update the signal plot
         """
 
-        fig, ax = pyplot.subplots()
-        pyplot.loglog(self.step_time_array, self.u95_array[::-1])
+        if interactive:
+            fig, (ax1, ax2) = pyplot.subplots(2,1)
+        else:
+            fig, ax2 = pyplot.subplots()
 
+
+        ax2.loglog(self.step_time_array, self.u95_array[::-1])
 
         # Display the grid (t, 1/t)
         grid_t = np.array([self.step_time_array[0]/2, self.step_time_array[-1]*2])
         for i in range(-20,20):
             factor = 10**(i/2)
-            pyplot.loglog(grid_t,
+            ax2.loglog(grid_t,
                           factor/grid_t,
                           color='grey', alpha=0.5, linewidth=0.5)
 
-        if show_cursor:
+        if interactive:
             def update_cursor(index):
                 min_u95 = self.u95_array[-index-1]
                 discard_time = self.step_time_array[-1] - self.step_time_array[index]
@@ -207,32 +211,62 @@ class pyTST:
                 text.set_text('u95={:2e}\nt={}'.format(min_u95, discard_time))
                 print("t={}, mean={:e} ± {:e}".format(discard_time, self.mean_array[-index-1], min_u95))
 
+                split_index = np.searchsorted(self.time_array, discard_time)
+                ax1_vertline.set_xdata(self.time_array[split_index])
+                ax1_startup_signal.set_xdata(self.time_array[0:split_index])
+                ax1_startup_signal.set_ydata(self.signal_array[0:split_index])
+
+                ax1_rest_signal.set_xdata(self.time_array[split_index:])
+                ax1_rest_signal.set_ydata(self.signal_array[split_index:])
 
             def onclick(event):
                 # only act on double click
                 if not event.dblclick:
                     return
 
-                index = min(np.searchsorted(self.step_time_array, event.xdata), len(self.step_time_array) - 1)
+                if event.inaxes == ax2:
+                    index = min(np.searchsorted(self.step_time_array, event.xdata), len(self.step_time_array) - 1)
+                elif event.inaxes == ax1:
+                    index = min(np.searchsorted(self.step_time_array, self.step_time_array[-1] - event.xdata), len(self.step_time_array) - 1)
+                else:
+                    return
+
                 update_cursor(index)
                 pyplot.draw()
 
-            hline = ax.axhline(color='k', lw=0.8, ls='--', alpha=0.6)
-            vline = ax.axvline(color='k', lw=0.8, ls='--', alpha=0.6)
 
-            text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
+            # Signal input
+            ax1_vertline = ax1.axvline(0, color='k', lw=0.8, ls='--', alpha=0.6)
+            ax1_startup_signal = ax1.plot([], [], color='C1', alpha=0.8)[0]
+            ax1_rest_signal = ax1.plot([], [], color='C0')[0]
+
+            # TST plot
+            hline = ax2.axhline(color='k', lw=0.8, ls='--', alpha=0.6)
+            vline = ax2.axvline(color='k', lw=0.8, ls='--', alpha=0.6)
+
+            text = ax1.text(0.05, 1.1, '', transform=ax1.transAxes)
             update_cursor(np.argmin(self.u95_array[::-1]))
 
             cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
 
-        pyplot.ylim(top=np.max(self.u95_array)*2,
+        ax2.set_ylim(top=np.max(self.u95_array)*2,
                     bottom= np.min(self.u95_array)/2)
-        pyplot.xlim(right=self.step_time_array[-1]*2,
+        ax2.set_xlim(right=self.step_time_array[-1]*2,
                     left=self.step_time_array[0]/2)
-        pyplot.xlabel("t")
-        pyplot.ylabel("95% uncertainty (u95)")
+        ax2.set_xlabel("t")
+        ax2.set_ylabel("95% uncertainty (u95)")
+        pyplot.tight_layout()
 
+        if interactive:
+            ax1.set_xlabel("t")
+            ax1.set_ylabel("signal")
+
+            ax1.set_xlim(right=self.time_array[-1],
+                        left=self.time_array[0])
+
+            ax1.set_ylim(top=max(self.signal_array),
+                         bottom=min(self.signal_array))
 
         if filename is None:
             pyplot.show()
@@ -240,7 +274,11 @@ class pyTST:
             print("Figure exported to {}".format(filename))
             pyplot.savefig(filename)
 
-        return fig, ax
+
+        if interactive:
+            return fig, (ax1, ax2)
+        else:
+            return fig, ax2
 
 
 
