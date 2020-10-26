@@ -8,15 +8,6 @@ import multiprocessing as mp
 from matplotlib import pyplot
 
 
-def moving_average(y, n=10) :
-    y_padded = np.pad(y, (n//2, n-1-n//2), mode='edge')
-    y_smooth = np.convolve(y_padded, np.ones((n,))/n, mode='valid') 
-    return y_smooth
-
-
-
-
-
 class pyTST:
     """
     Class performing and processing the Transient Scanning Technique
@@ -91,20 +82,18 @@ class pyTST:
             usecols = (signal_column, time_column)
 
         timedata = np.loadtxt(filename, usecols=usecols, **kwargs)
-
-
+        
         if time_column is None:
             self.signal_array = timedata
             self.time_array = (np.array(range(len(self.signal_array)))+1)*tstep
         else:
             self.signal_array = timedata[:, 0]
             self.time_array = timedata[:, 1]*tstep
-        self.moving_average = np.array(self.signal_array.size)
 
 
     def compute_TST(self, step_size=10, analyse_end=False, nproc=None):
         """
-        Actual computation of the Transient Scanning Technique 
+        Actual computation of the Transient Scanning Technique
 
         Parameters
         ----------
@@ -115,7 +104,7 @@ class pyTST:
             analyse the end of the signal instead of the begining, (TST-B instead of TST-A)
 
         nproc : int, optional
-            number of process to use for the parallel computation, 
+            number of process to use for the parallel computation,
             if not provided the maximum available will be used
 
         """
@@ -147,10 +136,6 @@ class pyTST:
         self.u95_array = [ row[1] for row in result ]
         self.step_time_array = np.array([ time[step_size*istart] for istart in range(nb_slices) ])
 
-
-
-        self.moving_average = moving_average(self.signal_array,n=step_size)
-
         if analyse_end:
             self.step_time_array = self.step_time_array[::-1]
 
@@ -162,9 +147,9 @@ class pyTST:
         ----------
         filename : str
             filename of the file to save
-            
+
         """
- 
+
         export_array = np.column_stack((self.step_time_array, self.u95_array, self.mean_array),)
         np.savetxt(filename, export_array,
                    header="t, u95, mean")
@@ -177,64 +162,70 @@ class pyTST:
         ----------
         filename : str
             filename of the file to import
-            
+
         """
- 
+
         timedata = np.loadtxt(filename)
         self.step_time_array = timedata[:, 0]
         self.u95_array = timedata[:, 1]
         self.mean_array = timedata[:, 2]
 
-    def plot(self, fileprefix=None, fileformat='.png',show_cursor=True,\
-            select_time_discard=True,step_size=10):
+    def plot(self, filename=None, interactive=True):
         """
         Plot the TST results previously computed
 
         Parameters
         ----------
 
-        fileprefix, fileformat : str, optional
-            if provided, the plot will be exported to fileprefix + fileformat
+        filename : str, optional
+            if provided, the plot will be exported to filename
 
-        show_cursor : bool, optional
-            True if a cursor is plotted. Double clicking on the plot will move it
-
-        select_time_discard: bool, optional
-            True if you wish to discard start-up effect by selecting in graph
-
-        step_size : integer, optional
-            Same as in TST, used for moving average.
-
+        interactive : bool, optional
+            True if the signal is also ploted and the discarded time is highlighted in orange, 
+            double clicking on the plot will move the cursor and update the signal plot
         """
 
-        # Plot TST
-        fig0, ax0 = pyplot.subplots()
+        if interactive:
+            fig, (ax1, ax2) = pyplot.subplots(2,1)
+        else:
+            fig, ax2 = pyplot.subplots()
 
-        time_size = self.step_time_array.size
+
 
 
         # Display the grid (t, 1/t)
         grid_t = np.array([self.step_time_array[0]/2, self.step_time_array[-1]*2])
         for i in range(-20,20):
             factor = 10**(i/2)
-            ax0.loglog(grid_t,
+            ax2.loglog(grid_t,
                           factor/grid_t,
                           color='grey', alpha=0.5, linewidth=0.5)
 
-        if show_cursor:
+        if interactive:
             def update_cursor(index):
                 min_u95 = self.u95_array[-index-1]
                 discard_time = self.step_time_array[-1] - self.step_time_array[index]
 
                 hline.set_ydata(min_u95)
                 vline.set_xdata(self.step_time_array[index])
-                ax0.loglog(self.step_time_array[:time_size - (time_size-index)], \
-                    self.u95_array[:(time_size-index-1):-1], color='C0')
-                ax0.loglog(self.step_time_array[time_size - (time_size-index):], \
-                    self.u95_array[(time_size-index-1)::-1], color='C1')
                 text.set_text('u95={:2e}\nt={}'.format(min_u95, discard_time))
-                print("t={}, mean={:e} ± {:e}".format(discard_time, self.mean_array[-index-1], min_u95))                         
-                return
+                print("t={}, mean={:e} ± {:e}".format(discard_time, self.mean_array[-index-1], min_u95))
+
+                split_index = np.searchsorted(self.time_array, discard_time)
+                ax1_vertline.set_xdata(self.time_array[split_index])
+
+                ax1_startup_signal.set_xdata(self.time_array[0:split_index])
+                ax1_startup_signal.set_ydata(self.signal_array[0:split_index])
+
+                ax1_rest_signal.set_xdata(self.time_array[split_index:])
+                ax1_rest_signal.set_ydata(self.signal_array[split_index:])
+                
+                ax2_startup_signal.set_xdata(self.step_time_array[index:])
+                ax2_startup_signal.set_ydata(self.u95_array[(self.step_time_array.size-index-1)::-1])
+
+                ax2_rest_signal.set_xdata(self.step_time_array[:index])
+                ax2_rest_signal.set_ydata(self.u95_array[:(self.step_time_array.size-index-1):-1])
+
 
 
 
@@ -243,69 +234,67 @@ class pyTST:
                 if not event.dblclick:
                     return
 
-                self.current_index = min(np.searchsorted(self.step_time_array, event.xdata), len(self.step_time_array) - 1)
-                update_cursor(self.current_index)
+                if event.inaxes == ax2:
+                    index = min(np.searchsorted(self.step_time_array, event.xdata), len(self.step_time_array) - 1)
+                elif event.inaxes == ax1:
+                    index = min(np.searchsorted(self.step_time_array, self.step_time_array[-1] - event.xdata), len(self.step_time_array) - 1)
+                else:
+                    return
 
+                update_cursor(index)
                 pyplot.draw()
-                return
 
 
-            hline = ax0.axhline(color='k', lw=0.8, ls='--', alpha=0.6)
-            vline = ax0.axvline(color='k', lw=0.8, ls='--', alpha=0.6)
+            # Signal input
+            ax1_vertline = ax1.axvline(0, color='k', lw=0.8, ls='--', alpha=0.6)
+            ax1_startup_signal = ax1.plot([], [], color='C1', alpha=0.8)[0]
+            ax1_rest_signal = ax1.plot([], [], color='C0')[0]
 
-            text = ax0.text(0.05, 0.9, '', transform=ax0.transAxes)
-            index = update_cursor(np.argmin(self.u95_array[::-1]))
+            # TST plot
+            hline = ax2.axhline(color='k', lw=0.8, ls='--', alpha=0.6)
+            vline = ax2.axvline(color='k', lw=0.8, ls='--', alpha=0.6)
 
-    
-            if select_time_discard:
-              cid = fig0.canvas.mpl_connect('button_press_event', onclick)
+            ax2_startup_signal = ax2.loglog([], [], color='C1', alpha=0.8)[0]
+            ax2_rest_signal = ax2.loglog([], [], color='C0')[0]
+
+            text = ax1.text(0.05, 1.1, '', transform=ax1.transAxes)
+            update_cursor(np.argmin(self.u95_array[::-1]))
+
+            cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
 
-
-
-
-
-        ax0.set_ylim(top=np.max(self.u95_array)*2,
+        ax2.set_ylim(top=np.max(self.u95_array)*2,
                     bottom= np.min(self.u95_array)/2)
-        ax0.set_xlim(right=self.step_time_array[-1]*2,
+        ax2.set_xlim(right=self.step_time_array[-1]*2,
                     left=self.step_time_array[0]/2)
-        ax0.set_xlabel("timestep",fontsize=16)
-        ax0.set_ylabel("95% uncertainty ($U_{95} (\phi)$)",fontsize=16)
+        ax2.set_xlabel("t")
+        ax2.set_ylabel("95% uncertainty (u95)")
+        pyplot.tight_layout()
 
-        pyplot.show()
+        if interactive:
+            ax1.set_xlabel("t")
+            ax1.set_ylabel("signal")
 
+            ax1.set_xlim(right=self.time_array[-1],
+                        left=self.time_array[0])
 
-            
+            ax1.set_ylim(top=max(self.signal_array),
+                         bottom=min(self.signal_array))
 
-        # Plot input signal data
-        fig1, ax1 = pyplot.subplots()
-
-        if select_time_discard:
-          idx = (time_size-self.current_index)*step_size
-
-        else:
-          idx = index
-
-        ax1.axvline(self.time_array[idx], color='k', lw=0.8, ls='--', alpha=0.6)
-
-        ax1.plot(self.time_array[0:idx], self.signal_array[0:idx], color='C1',linewidth=2,label='discarded time')
-        ax1.plot(self.time_array[idx:], self.signal_array[idx:], color='C0',linewidth=2,label='stationary region')
-        ax1.plot(self.time_array,self.moving_average, color='r',label='moving average')
-
-        ax1.set_xlabel("$t / $s",fontsize=16)
-        ax1.set_ylabel("$\phi$",fontsize=16)
-        ax1.legend(fontsize=16)
-        
-        
-        
-        if fileprefix is None:
+        if filename is None:
             pyplot.show()
         else:
-            pyplot.show()
-            print("Figure exported to {}".format(fileprefix))
-            fig0.savefig(fileprefix+'_TST'+fileformat,dpi=1000)
-            fig1.savefig(fileprefix+'_signal'+fileformat,dpi=1000)
-        return
+            print("Figure exported to {}".format(filename))
+            pyplot.savefig(filename)
+
+
+        if interactive:
+            return fig, (ax1, ax2)
+        else:
+            return fig, ax2
+
+
+
 
 
 def variance_stats(data):
@@ -346,3 +335,4 @@ def variance_stats(data):
     u95 = 1.96*np.sqrt(var_x_av)
 
     return mean, u95
+
