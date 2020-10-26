@@ -208,11 +208,17 @@ class pyTST:
 
                 hline.set_ydata(min_u95)
                 vline.set_xdata(self.step_time_array[index])
-                text.set_text('u95={:2e}\nt={}'.format(min_u95, discard_time))
+                text.set_text('mean={:e} ± {:e}\nt={}'.format(self.mean_array[-index-1], min_u95, discard_time))
                 print("t={}, mean={:e} ± {:e}".format(discard_time, self.mean_array[-index-1], min_u95))
 
                 split_index = np.searchsorted(self.time_array, discard_time)
                 ax1_vertline.set_xdata(self.time_array[split_index])
+                ax1_horline.set_ydata(self.mean_array[-index-1])
+
+                ax1_errorbar.set_ydata([self.mean_array[-index-1] - min_u95,
+                                        self.mean_array[-index-1] + min_u95])
+
+
                 ax1_startup_signal.set_xdata(self.time_array[0:split_index])
                 ax1_startup_signal.set_ydata(self.signal_array[0:split_index])
 
@@ -236,8 +242,12 @@ class pyTST:
 
 
             # Signal input
-            ax1_vertline = ax1.axvline(0, color='k', lw=0.8, ls='--', alpha=0.6)
-            ax1_startup_signal = ax1.plot([], [], color='C1', alpha=0.8)[0]
+            ax1_vertline = ax1.axvline(color='k', lw=0.8, ls='--', alpha=0.6)
+            ax1_horline = ax1.axhline(self.mean_array[0], color='red', lw=0.8, ls='--', alpha=0.6)
+            ax1_errorbar = ax1.plot([], [])[0]
+            ax1_errorbar.set_xdata([self.time_array[0]]*2)
+
+            ax1_startup_signal = ax1.plot(self.time_array, self.signal_array, color='C1', alpha=0.8)[0]
             ax1_rest_signal = ax1.plot([], [], color='C0')[0]
 
             # TST plot
@@ -262,11 +272,11 @@ class pyTST:
             ax1.set_xlabel("t")
             ax1.set_ylabel("signal")
 
-            ax1.set_xlim(right=self.time_array[-1],
-                        left=self.time_array[0])
+            # ax1.set_xlim(right=self.time_array[-1],
+                        # left=self.time_array[0])
 
-            ax1.set_ylim(top=max(self.signal_array),
-                         bottom=min(self.signal_array))
+            # ax1.set_ylim(top=max(self.signal_array),
+                         # bottom=min(self.signal_array))
 
         if filename is None:
             pyplot.show()
