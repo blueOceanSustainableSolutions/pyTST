@@ -211,13 +211,13 @@ class pyTST:
                 text.set_text('mean={:e} ± {:e}\nt={}'.format(self.mean_array[-index-1], min_u95, discard_time))
                 print("t={}, mean={:e} ± {:e}".format(discard_time, self.mean_array[-index-1], min_u95))
 
+                # Update signal plot
                 split_index = np.searchsorted(self.time_array, discard_time)
                 ax1_vertline.set_xdata(self.time_array[split_index])
-                ax1_horline.set_ydata(self.mean_array[-index-1])
+                ax1_meanline.set_ydata(self.mean_array[-index-1])
 
-                ax1_errorbar.set_ydata([self.mean_array[-index-1] - min_u95,
-                                        self.mean_array[-index-1] + min_u95])
-
+                ax1_upperU95line.set_ydata(self.mean_array[-index-1] + min_u95)
+                ax1_lowerU95line.set_ydata(self.mean_array[-index-1] - min_u95)
 
                 ax1_startup_signal.set_xdata(self.time_array[0:split_index])
                 ax1_startup_signal.set_ydata(self.signal_array[0:split_index])
@@ -243,18 +243,18 @@ class pyTST:
 
             # Signal input
             ax1_vertline = ax1.axvline(color='k', lw=0.8, ls='--', alpha=0.6)
-            ax1_horline = ax1.axhline(self.mean_array[0], color='red', lw=0.8, ls='--', alpha=0.6)
-            ax1_errorbar = ax1.plot([], [])[0]
-            ax1_errorbar.set_xdata([self.time_array[0]]*2)
+            ax1_meanline = ax1.axhline(self.mean_array[0], color='red', lw=0.8, ls='-', alpha=0.6, label="Mean")
+            ax1_upperU95line = ax1.axhline(self.mean_array[0], color='red', lw=0.8, ls='--', alpha=0.6, label="Uncertainty band")
+            ax1_lowerU95line = ax1.axhline(self.mean_array[0], color='red', lw=0.8, ls='--', alpha=0.6)
 
-            ax1_startup_signal = ax1.plot(self.time_array, self.signal_array, color='C1', alpha=0.8)[0]
+            ax1_startup_signal = ax1.plot(self.time_array, self.signal_array, color='C1', alpha=0.8, label="Discarded signal")[0]
             ax1_rest_signal = ax1.plot([], [], color='C0')[0]
+            text = ax1.text(0.05, 1.1, '', transform=ax1.transAxes)
 
             # TST plot
             hline = ax2.axhline(color='k', lw=0.8, ls='--', alpha=0.6)
             vline = ax2.axvline(color='k', lw=0.8, ls='--', alpha=0.6)
 
-            text = ax1.text(0.05, 1.1, '', transform=ax1.transAxes)
             update_cursor(np.argmin(self.u95_array[::-1]))
 
             cid = fig.canvas.mpl_connect('button_press_event', onclick)
@@ -269,6 +269,7 @@ class pyTST:
         pyplot.tight_layout()
 
         if interactive:
+            ax1.legend(frameon=False)
             ax1.set_xlabel("t")
             ax1.set_ylabel("signal")
 
