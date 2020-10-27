@@ -171,15 +171,14 @@ class pyTST:
         self.u95_array = timedata[:, 1]
         self.mean_array = timedata[:, 2]
 
-    def plot(self, file_prefix=None,file_extension=None, interactive=True):
+    def plot(self, filename=None, interactive=True):
         """
         Plot the TST results previously computed
 
         Parameters
         ----------
-
-        file_prefix, file_extension : str, optional
-            if provided, the plot will be exported to file_prefix + file_prefix
+        filename : str, optional
+            name of the image file to export the plot to
 
         interactive : bool, optional
             True if the signal is also ploted and the discarded time is highlighted in orange, 
@@ -289,16 +288,11 @@ class pyTST:
             # ax1.set_ylim(top=max(self.signal_array),
                          # bottom=min(self.signal_array))
 
-        if (file_prefix is None) and (file_extension is None):
+        if filename is None:
             pyplot.show()
         else:
-            if file_prefix is None:
-              print("File prefix is missing")
-            elif file_extension is None:
-              print("File extension is missing")
-            else:
-              print("Figure exported to {}".format(file_prefix + file_extension))
-              pyplot.savefig(file_prefix + file_extension)
+            print("Figure exported to {}".format(filename))
+            pyplot.savefig(filename)
 
 
         if interactive:
