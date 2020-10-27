@@ -203,8 +203,7 @@ class pyTST:
                 min_u95 = self.u95_array[-index-1]
                 discard_time = self.step_time_array[-1] - self.step_time_array[index]
 
-                hline.set_ydata(min_u95)
-                vline.set_xdata(self.step_time_array[index])
+                # Update header
                 text.set_text('mean={:e} ± {:e}\nt={}'.format(self.mean_array[-index-1], min_u95, discard_time))
                 print("t={}, mean={:e} ± {:e}".format(discard_time, self.mean_array[-index-1], min_u95))
 
@@ -223,12 +222,14 @@ class pyTST:
                 ax1_rest_signal.set_ydata(self.signal_array[split_index:])
 
                 # Update uncertainty plot
+                hline.set_ydata(min_u95)
+                vline.set_xdata(self.step_time_array[index])
+
                 ax2_startup_signal.set_xdata(self.step_time_array[index:])
                 ax2_startup_signal.set_ydata(self.u95_array[(self.step_time_array.size-index-1)::-1])
 
                 ax2_rest_signal.set_xdata(self.step_time_array[:index])
                 ax2_rest_signal.set_ydata(self.u95_array[:(self.step_time_array.size-index-1):-1])
-
 
 
             def onclick(event):
@@ -268,6 +269,10 @@ class pyTST:
 
             cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
+        # if not interactive: plot the TST only
+        else:
+            ax2.loglog(self.step_time_array, self.u95_array[::-1])
+
 
         ax2.set_ylim(top=np.max(self.u95_array)*2,
                     bottom= np.min(self.u95_array)/2)
@@ -282,12 +287,6 @@ class pyTST:
             ax1.set_xlabel("t")
             ax1.set_ylabel("signal")
 
-            # ax1.set_xlim(right=self.time_array[-1],
-                        # left=self.time_array[0])
-
-            # ax1.set_ylim(top=max(self.signal_array),
-                         # bottom=min(self.signal_array))
-
         if filename is None:
             pyplot.show()
         else:
@@ -299,7 +298,6 @@ class pyTST:
             return fig, (ax1, ax2)
         else:
             return fig, ax2
-
 
 
 
