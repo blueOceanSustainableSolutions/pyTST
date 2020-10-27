@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Transient Scanning Technique implementation
 # Sebastien Lemaire: <sebastien.lemaire@soton.ac.uk>
+# Maarten Klapwijk: <m.d.klapwijk@hotmail.com>
 
 import numpy as np
 import multiprocessing as mp
@@ -170,15 +171,15 @@ class pyTST:
         self.u95_array = timedata[:, 1]
         self.mean_array = timedata[:, 2]
 
-    def plot(self, filename=None, interactive=True):
+    def plot(self, file_prefix=None,file_extension=None, interactive=True):
         """
         Plot the TST results previously computed
 
         Parameters
         ----------
 
-        filename : str, optional
-            if provided, the plot will be exported to filename
+        file_prefix, file_extension : str, optional
+            if provided, the plot will be exported to file_prefix + file_prefix
 
         interactive : bool, optional
             True if the signal is also ploted and the discarded time is highlighted in orange, 
@@ -189,9 +190,6 @@ class pyTST:
             fig, (ax1, ax2) = pyplot.subplots(2,1)
         else:
             fig, ax2 = pyplot.subplots()
-
-
-        ax2.loglog(self.step_time_array, self.u95_array[::-1])
 
         # Display the grid (t, 1/t)
         grid_t = np.array([self.step_time_array[0]/2, self.step_time_array[-1]*2])
@@ -225,6 +223,15 @@ class pyTST:
                 ax1_rest_signal.set_xdata(self.time_array[split_index:])
                 ax1_rest_signal.set_ydata(self.signal_array[split_index:])
 
+                # Update uncertainty plot
+                ax2_startup_signal.set_xdata(self.step_time_array[index:])
+                ax2_startup_signal.set_ydata(self.u95_array[(self.step_time_array.size-index-1)::-1])
+
+                ax2_rest_signal.set_xdata(self.step_time_array[:index])
+                ax2_rest_signal.set_ydata(self.u95_array[:(self.step_time_array.size-index-1):-1])
+
+
+
             def onclick(event):
                 # only act on double click
                 if not event.dblclick:
@@ -255,6 +262,9 @@ class pyTST:
             hline = ax2.axhline(color='k', lw=0.8, ls='--', alpha=0.6)
             vline = ax2.axvline(color='k', lw=0.8, ls='--', alpha=0.6)
 
+            ax2_startup_signal = ax2.loglog([], [], color='C1', alpha=0.8)[0]
+            ax2_rest_signal = ax2.loglog([], [], color='C0')[0]
+
             update_cursor(np.argmin(self.u95_array[::-1]))
 
             cid = fig.canvas.mpl_connect('button_press_event', onclick)
@@ -279,11 +289,16 @@ class pyTST:
             # ax1.set_ylim(top=max(self.signal_array),
                          # bottom=min(self.signal_array))
 
-        if filename is None:
+        if (file_prefix is None) and (file_extension is None):
             pyplot.show()
         else:
-            print("Figure exported to {}".format(filename))
-            pyplot.savefig(filename)
+            if file_prefix is None:
+              print("File prefix is missing")
+            elif file_extension is None:
+              print("File extension is missing")
+            else:
+              print("Figure exported to {}".format(file_prefix + file_extension))
+              pyplot.savefig(file_prefix + file_extension)
 
 
         if interactive:
