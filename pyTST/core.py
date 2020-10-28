@@ -215,8 +215,8 @@ class pyTST:
                 ax1_upperU95line.set_ydata(self.mean_array[-index-1] + min_u95)
                 ax1_lowerU95line.set_ydata(self.mean_array[-index-1] - min_u95)
 
-                ax1_startup_signal.set_xdata(self.time_array[0:split_index])
-                ax1_startup_signal.set_ydata(self.signal_array[0:split_index])
+                ax1_startup_signal.set_xdata(self.time_array[0:split_index+1])
+                ax1_startup_signal.set_ydata(self.signal_array[0:split_index+1])
 
                 ax1_rest_signal.set_xdata(self.time_array[split_index:])
                 ax1_rest_signal.set_ydata(self.signal_array[split_index:])
@@ -228,8 +228,8 @@ class pyTST:
                 ax2_startup_signal.set_xdata(self.step_time_array[index:])
                 ax2_startup_signal.set_ydata(self.u95_array[(self.step_time_array.size-index-1)::-1])
 
-                ax2_rest_signal.set_xdata(self.step_time_array[:index])
-                ax2_rest_signal.set_ydata(self.u95_array[:(self.step_time_array.size-index-1):-1])
+                ax2_rest_signal.set_xdata(self.step_time_array[:index+1])
+                ax2_rest_signal.set_ydata(self.u95_array[:(self.step_time_array.size-index-2):-1])
 
 
             def onclick(event):
