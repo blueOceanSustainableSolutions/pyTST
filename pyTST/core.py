@@ -238,12 +238,13 @@ class pyTST:
                     return
 
                 if event.inaxes == ax2:
-                    index = min(np.searchsorted(self.step_time_array, event.xdata), len(self.step_time_array) - 1)
+                    index = np.searchsorted(self.step_time_array, event.xdata)
                 elif event.inaxes == ax1:
-                    index = min(np.searchsorted(self.step_time_array, self.step_time_array[-1] - event.xdata), len(self.step_time_array) - 1)
+                    index = np.searchsorted(self.step_time_array, self.step_time_array[-1] - event.xdata)
                 else:
                     return
 
+                index = max(min(index, len(self.step_time_array)-2), 0)
                 update_cursor(index)
                 pyplot.draw()
 
