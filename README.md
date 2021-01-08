@@ -96,14 +96,15 @@ help(pyTST)
 # How to cite?
 This code can be cited with:
 ```
-@software{lemaire_sebastien_2021_4428181,
-  author       = {Lemaire, Sébastien},
-  title        = {PyMMS},
+@software{lemaire_sebastien_2021_4428158,
+  author       = {Lemaire, Sébastien and
+                  Klapwijk, Maarten},
+  title        = {pyTST},
   month        = jan,
   year         = 2021,
   publisher    = {Zenodo},
   version      = {v1.0},
-  doi          = {10.5281/zenodo.4428181},
-  url          = {https://doi.org/10.5281/zenodo.4428181}
+  doi          = {10.5281/zenodo.4428158},
+  url          = {https://doi.org/10.5281/zenodo.4428158}
 }
 ```
