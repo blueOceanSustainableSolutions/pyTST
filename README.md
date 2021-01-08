@@ -1,5 +1,9 @@
 # pyTST
 
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4428158.svg)](https://doi.org/10.5281/zenodo.4428158)
+
+
 This module performs the "Transient Scanning Technique" presented in:
 
 * Brouwer, J., Tukker, J., & van Rijsbergen, M. (2013). Uncertainty Analysis of Finite Length Measurement Signals. 3rd International Conference on Advanced Model Measurement Technology for the EU Maritime Industry. [[PDF]](https://www.researchgate.net/profile/Joris_Brouwer/publication/295702719_Uncertainty_Analysis_of_Finite_Length_Measurement_Signals/links/56cc943e08ae059e375067d9/Uncertainty-Analysis-of-Finite-Length-Measurement-Signals.pdf)
@@ -87,4 +91,19 @@ For more info, the library is documented via docstrings:
 ``` python
 from pyTST import pyTST
 help(pyTST)
+```
+
+# How to cite?
+This code can be cited with:
+```
+@software{lemaire_sebastien_2021_4428181,
+  author       = {Lemaire, Sébastien},
+  title        = {PyMMS},
+  month        = jan,
+  year         = 2021,
+  publisher    = {Zenodo},
+  version      = {v1.0},
+  doi          = {10.5281/zenodo.4428181},
+  url          = {https://doi.org/10.5281/zenodo.4428181}
+}
 ```
