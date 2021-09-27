@@ -23,7 +23,7 @@ It allows to easily detect transient portion of a signal and measure the statist
 ## Install
 Can be installed like any python package, for example:
 ``` sh
-pip3 install --user https://github.com/WavEC-Offshore-Renewables/pyTST/archive/master.zip
+pip3 install --user https://github.com/Nanoseb/pyTST/archive/master.zip
 ```
 
 
