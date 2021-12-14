@@ -200,6 +200,7 @@ class pyTST:
 
         if interactive:
             def update_cursor(index):
+                index = min(index, len(self.u95_array)-2)
                 min_u95 = self.u95_array[-index-1]
                 discard_time = self.step_time_array[-1] - self.step_time_array[index]
 
@@ -276,9 +277,9 @@ class pyTST:
 
 
         ax2.set_ylim(top=np.max(self.u95_array)*2,
-                    bottom= np.min(self.u95_array)/2)
+                     bottom=np.min(self.u95_array[:-3])/2)
         ax2.set_xlim(right=self.step_time_array[-1]*2,
-                    left=self.step_time_array[0]/2)
+                     left=self.step_time_array[0]/2)
         ax2.set_xlabel("t")
         ax2.set_ylabel("95% uncertainty (u95)")
         pyplot.tight_layout()
