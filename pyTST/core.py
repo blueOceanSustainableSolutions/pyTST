@@ -266,7 +266,7 @@ class pyTST:
             ax2_startup_signal = ax2.loglog([], [], color='C1', alpha=0.8)[0]
             ax2_rest_signal = ax2.loglog([], [], color='C0')[0]
 
-            update_cursor(np.argmin(self.u95_array[::-1]))
+            update_cursor(np.argmin(self.u95_array[-5::-1])+4)
 
             cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
